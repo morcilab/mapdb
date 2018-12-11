@@ -5,6 +5,8 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
+import org.mapdb.HTreeMap;
+import org.mapdb.HTreeMap.KeySet;
 import org.mapdb.Serializer;
 
 public class App {
@@ -36,10 +38,13 @@ public class App {
 		DB db = DBMaker.fileDB(DB_FILE).make();
 
 		// creo una semplice mappa String -> String nel db
-		ConcurrentMap<String, String> map = db.hashMap(SIMPLE_MAP, Serializer.STRING, Serializer.STRING).createOrOpen();
+		// il tipo HTreeMap è thread safe
+		HTreeMap<String, String> map = db.hashMap(SIMPLE_MAP).keySerializer(Serializer.STRING).valueSerializer(Serializer.STRING).createOrOpen();
 
 		// aggiungo gli elementi alla mappa
+		System.out.println("Aggiungo alla mappa la entry (key, value)");
 		map.put("key", "value");
+		System.out.println("Aggiungo alla mappa la entry (key1, value1)");
 		map.put("key1", "value1");
 
 		// persisto la mappa su file system e chiudo la connessione al db
@@ -52,7 +57,8 @@ public class App {
 		DB db = DBMaker.fileDB(DB_FILE).make();
 
 		// creao un riferimento alla mappa nel db(nota è lo stesso comando per creare la mappa)
-		ConcurrentMap<String, String> map = db.hashMap(SIMPLE_MAP, Serializer.STRING, Serializer.STRING).createOrOpen();
+		// il tipo HTreeMap è thread safe
+		HTreeMap<String, String> map = db.hashMap(SIMPLE_MAP).keySerializer(Serializer.STRING).valueSerializer(Serializer.STRING).createOrOpen();
 
 		// recupero gli elemetni aggiunti nel db
 		System.out.println("Elemento associato alla chiave key: " + map.getOrDefault("key", "not found"));
@@ -69,11 +75,15 @@ public class App {
 		DB db = DBMaker.fileDB(DB_FILE).make();
 
 		// Creo un insieme nel db
-		NavigableSet<String> treeSet = db.treeSet(SIMPLE_SET).serializer(Serializer.STRING).createOrOpen();
+		// Il set così creato è thread safe
+		KeySet<String> treeSet = db.hashSet(SIMPLE_SET).serializer(Serializer.STRING).createOrOpen();
 
 		// Aggiungo degli elementi
+		System.out.println("Aggiungo Elemento 1 all'insieme");
 		treeSet.add("Elemento 1");
+		System.out.println("Aggiungo Elemento 2 all'insieme");
 		treeSet.add("Elemento 2");
+		System.out.println("Aggiungo Elemento 3 all'insieme");
 		treeSet.add("Elemento 3");
 
 		// Persisto il db sul file system
@@ -86,7 +96,8 @@ public class App {
 		DB db = DBMaker.fileDB(DB_FILE).make();
 
 		// cremo un riferimento all'insieme di stringhe creato precedemente
-		NavigableSet<String> treeSet = db.treeSet(SIMPLE_SET).serializer(Serializer.STRING).createOrOpen();
+		// Il set così creato è thread safe
+		KeySet<String> treeSet = db.hashSet(SIMPLE_SET).serializer(Serializer.STRING).createOrOpen();
 
 		System.out.println("Elementi contenuti nell'insieme:");
 		for (String element : treeSet) {
