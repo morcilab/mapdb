@@ -2,7 +2,7 @@
 Un semplice esempio di utilizzo di maven e mapdb.
 Per provare il progetto su sistema unix/linux:
 ```
-$ git clone https://github.com/luigi-asprino/mapdb.git
+$ git clone https://github.com/morcilab/mapdb.git
 $ cd mapdb
 $ mvn clean install
 ```
